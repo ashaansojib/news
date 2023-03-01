@@ -18,10 +18,16 @@
     </header>
     <main>
         <div class="w-[1000px] mx-auto p-2 bg-gray-100 my-2">
-            <h2 class="text-2xl">this is featured imd</h2>
+            <h2 id="recent" class="text-2xl">No post found in category....</h2>
         </div>
         <div id="article-area" class="w-[1000px] mx-auto">
             <!-- append here news card b js -->
+        </div>
+        <div id="post" class="w-[1000px] mx-auto p-2 my-2">
+
+        </div>
+        <div class="w-[1000px] text-center mx-auto p-2 my-2">
+            <button id="load-more" class="btn hidden">Load More</button>
         </div>
     </main>
     <!-- scropt areas -->
@@ -35,21 +41,18 @@
         }
         // display nav title
         const displayNav = navigation =>{
-            // console.log(navigation.news_category)
             const container = document.getElementById("nav");
             navigation.news_category.forEach(cat =>{
-                // console.log(cat.category_name);
                 const li = document.createElement('li');
                 li.classList.add('list-none')
                 li.innerHTML= `
                 <a class="font-semibold" onclick="showCatNews('${cat.category_id}')" href="#">${cat.category_name}</a>
                 `;
-                container.appendChild(li)
+                container.appendChild(li);
             });
         }
         // show category new
         const showCatNews = catId =>{
-            // console.log(catId)
             const url = `https://openapi.programming-hero.com/api/news/category/${catId}`
             fetch(url)
             .then(res => res.json())
@@ -57,28 +60,55 @@
         }
         // show cat news on card
         const displayCard = data =>{
-            // console.log(data[0].title)
+            // console.log(data.length)
+            document.getElementById("recent").innerText = data.length + ' ' + 'recent post in this category!!';
             const container = document.getElementById("article-area");
             container.textContent = '';
             data.forEach(details =>{
-                // console.log(details);
                 const createDiv = document.createElement('div');
                 createDiv.classList.add('mb-4');
                 createDiv.innerHTML = `
                 <div class="card p-4 grid grid-cols-3 bg-gray-200 shadow-xl">
                 <div>
-                    <img class="w-full" src="${details.image_url}" alt="" />
+                    <img class="w-full h-full" src="${details.image_url}" alt="" />
                 </div>
-                <div class="card-body col-span-2">
-                  <h2 class="card-title">${details.title}</h2>
+                <div class="col-span-2 p-2">
+                    <span>${details.author.published_date}</span>
+                  <h2 class="font-semibold text-2xl py-2">${details.title}</h2>
                   <p>${details.details.slice(1, 150)}...</p>
-                    <button class="btn w-32 btn-primary">Buy Now</button>
                 </div>
                 </div>
                 `;
                 container.appendChild(createDiv);
             })
         }
+        const allNews = id =>{
+            fetch('https://openapi.programming-hero.com/api/news/category/08')
+            .then(res => res.json())
+            .then(data => displayAll(data.data))
+        }
+        const displayAll = data =>{
+            const container = document.getElementById("post");
+            
+            data.slice(0, 7).forEach(singleNews =>{
+                const createDiv = document.createElement('div');
+                createDiv.classList.add('mb-4');
+                createDiv.innerHTML = `
+                <div class="card p-4 grid grid-cols-3 bg-gray-200 shadow-xl">
+                <div>
+                    <img class="w-full h-full" src="${singleNews.image_url}" alt="" />
+                </div>
+                <div class="col-span-2 p-2">
+                    <span>${singleNews.author.published_date}</span>
+                  <h2 class="font-semibold text-2xl py-2">${singleNews.title}</h2>
+                  <p>${singleNews.details.slice(1, 150)}...</p>
+                </div>
+                </div>
+                `;
+                container.appendChild(createDiv)
+            });
+        }
+        allNews()
     </script>
 </body>
 </html>
