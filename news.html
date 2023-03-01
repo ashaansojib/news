@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@2.51.2/dist/full.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body onload="loadData()">
+    <header class="bg-slate-400 p-2">
+        <div class="w-[1000px] mx-auto">
+            <div id="nav" class="flex justify-between p-2 text-white">
+                
+            </div>
+        </div>
+    </header>
+    <main>
+        <div class="w-[1000px] mx-auto p-2 bg-gray-100 my-2">
+            <h2 class="text-2xl">this is featured imd</h2>
+        </div>
+        <div id="article-area" class="w-[1000px] mx-auto">
+            <!-- append here news card b js -->
+        </div>
+    </main>
+    <!-- scropt areas -->
+    <script>
+        // fetch api data by url
+        const loadData = () =>{
+            const url =`https://openapi.programming-hero.com/api/news/categories`
+            fetch(url)
+            .then(res => res.json())
+            .then(data => displayNav(data.data))
+        }
+        // display nav title
+        const displayNav = navigation =>{
+            // console.log(navigation.news_category)
+            const container = document.getElementById("nav");
+            navigation.news_category.forEach(cat =>{
+                // console.log(cat.category_name);
+                const li = document.createElement('li');
+                li.classList.add('list-none')
+                li.innerHTML= `
+                <a class="font-semibold" onclick="showCatNews('${cat.category_id}')" href="#">${cat.category_name}</a>
+                `;
+                container.appendChild(li)
+            });
+        }
+        // show category new
+        const showCatNews = catId =>{
+            // console.log(catId)
+            const url = `https://openapi.programming-hero.com/api/news/category/${catId}`
+            fetch(url)
+            .then(res => res.json())
+            .then(data => displayCard(data.data))
+        }
+        // show cat news on card
+        const displayCard = data =>{
+            // console.log(data[0].title)
+            const container = document.getElementById("article-area");
+            container.textContent = '';
+            data.forEach(details =>{
+                // console.log(details);
+                const createDiv = document.createElement('div');
+                createDiv.classList.add('mb-4');
+                createDiv.innerHTML = `
+                <div class="card p-4 grid grid-cols-3 bg-gray-200 shadow-xl">
+                <div>
+                    <img class="w-full" src="${details.image_url}" alt="" />
+                </div>
+                <div class="card-body col-span-2">
+                  <h2 class="card-title">${details.title}</h2>
+                  <p>${details.details.slice(1, 150)}...</p>
+                    <button class="btn w-32 btn-primary">Buy Now</button>
+                </div>
+                </div>
+                `;
+                container.appendChild(createDiv);
+            })
+        }
+    </script>
+</body>
+</html>
